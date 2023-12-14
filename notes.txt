@@ -9,3 +9,14 @@
     $createdAlertRuleIds = $bicepOutputs.createdAlertRuleIds.value -join ','
     echo "##vso[task.setvariable variable=createdAlertRuleIds]$createdAlertRuleIds"
   displayName: 'Convert Array to String and Set as Variable'
+
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: '<YourServiceConnection>'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      appId=$(az network application-gateway show --name <ApplicationGatewayName> --resource-group <ResourceGroupName> --query "id" -o tsv)
+      echo "##vso[task.setvariable variable=applicationGatewayId]$appId"
+  name: fetchAppGatewayId
+
