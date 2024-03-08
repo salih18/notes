@@ -1,0 +1,12 @@
+# Variables
+keyVaultName="<YourKeyVaultName>"
+storageAccountId="<YourStorageAccountResourceId>" # Resource ID of your Storage Account
+
+# Retrieve the principal ID of the system-assigned managed identity of the Storage Account
+principalId=$(az resource show --ids $storageAccountId --query identity.principalId -o tsv)
+
+# Update the Key Vault access policy to include the Storage Account's system-assigned managed identity
+# This example grants list, get permissions on secrets, and wrapKey, unwrapKey permissions on keys.
+az keyvault set-policy --name $keyVaultName --object-id $principalId --secret-permissions get list --key-permissions wrapKey unwrapKey
+
+echo "Storage account's managed identity has been whitelisted in the Key Vault access policy with the specified permissions."
