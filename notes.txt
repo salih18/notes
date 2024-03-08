@@ -10,3 +10,21 @@ principalId=$(az resource show --ids $storageAccountId --query identity.principa
 az keyvault set-policy --name $keyVaultName --object-id $principalId --secret-permissions get list --key-permissions wrapKey unwrapKey
 
 echo "Storage account's managed identity has been whitelisted in the Key Vault access policy with the specified permissions."
+
+
+
+# Enable system-assigned managed identity for your Storage account
+az storage account update --name <YourStorageAccountName> --resource-group <YourResourceGroupName> --assign-identity
+
+# Get the Storage account's principal ID
+principalId=$(az storage account show --name <YourStorageAccountName> --query identity.principalId --output tsv)
+
+# Grant the Storage account access to Key Vault
+az keyvault set-policy --name <YourKeyVaultName> --object-id $principalId --key-permissions get unwrapKey wrapKey --secret-permissions get
+
+# Update the Storage account to use the Key Vault for encryption
+az storage account update --name <YourStorageAccountName> \
+    --resource-group <YourResourceGroupName> \
+    --encryption-key-source Microsoft.Keyvault \
+    --encryption-key-vault-properties keyvaulturi=https://<YourKeyVaultName>.vault.azure.net/ \
+    --encryption-key-name <YourKeyName>
