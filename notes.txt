@@ -32,3 +32,22 @@ az storage account update --name <YourStorageAccountName> \
 
    principalId=$(az deployment group create --resource-group <YourResourceGroup> --template-file umi.bicep --query "properties.outputs.principalId.value" -o tsv)
       echo "##vso[task.setvariable variable=principalId]$principalId"
+
+
+      $JSON_WITH_SPACES = '${{ convertToJson(parameters.allowedSubnetIds) }}'
+      $JSON_WITHOUT_SPACES = $JSON_WITH_SPACES -replace ' ', ''
+      $isArray = if ((ConvertFrom-Json $JSON_WITHOUT_SPACES).GetType().Name -eq 'JArray') { $true } else { $false }
+      $idArray = if ($isArray) { $JSON_WITHOUT_SPACES } else { "[$JSON_WITHOUT_SPACES]" }
+      
+      az deployment group create `
+        --name '${{ parameters.storageAccountName }}' `
+        --resource-group '${{ parameters.resourceGroupName }}' `
+        --template-file 'pipelines/biceps/storageaccount/main.bicep' `
+        --parameters "@pipelines/biceps/storageaccount/ipRules-${{ parameters.envs }}.parameters.json" `
+        --parameters "allowedSubnetIds=$idArray" `
+        --parameters "principalId='${{ parameters.servicePrincipalId }}'" `
+        --parameters "groupId='${{ parameters.groupId }}'" `
+        --parameters "storageAccountName='${{ parameters.storageAccountName }}'" `
+        --parameters "cmkName='${{ parameters.cmkName }}'" `
+        --parameters "keyvaultName='${{ parameters.keyvaultName }}'" `
+        --parameters "userManagedIdentityName='${{ parameters.userManagedIdentityName }}'"
