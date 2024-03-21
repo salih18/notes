@@ -85,3 +85,45 @@ az storage account update --name <YourStorageAccountName> \
       -keyvaultName ${{ parameters.keyvaultName }}
       -userManagedIdentityName ${{ parameters.userManagedIdentityName }}
     deploymentMode: 'Incremental'
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Azure Services Diagram</title>
+</head>
+<body style="font-family: Arial, sans-serif; text-align: center;">
+
+<div style="position: relative; width: 100%; padding-top: 50px; height: 800px;">
+    <!-- Central Node -->
+    <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 100px; height: 100px; border-radius: 50%; background-color: #1E90FF; color: white; line-height: 100px;">
+        AZURE
+    </div>
+
+    <!-- Networking Node -->
+    <div style="position: absolute; left: calc(50% - 150px); top: calc(50% - 150px); width: 90px; height: 90px; border-radius: 50%; background-color: #32CD32; color: white; line-height: 90px;">
+        Networking
+    </div>
+
+    <!-- Lines -->
+    <div style="position: absolute; left: 50%; top: 50%; width: 2px; height: 150px; background-color: black; transform: translate(-75px, -75px);"></div>
+
+    <!-- Sub-nodes for Networking -->
+    <div style="position: absolute; left: calc(50% - 300px); top: calc(50% - 150px); width: 120px; color: black; line-height: 20px; text-align: center;">
+        Virtual Network<br>
+        Private link<br>
+        Application Gateway
+    </div>
+
+    <!-- Security Node -->
+    <!-- Add similar blocks for other nodes, with absolute positioning -->
+
+    <!-- You will need to adjust the 'left' and 'top' percentages to position the elements appropriately -->
+
+</div>
+
+</body>
+</html>
+
