@@ -1,0 +1,46 @@
+<template>
+  <div>
+    <h1>Product Detail Page</h1>
+    <p>Track load time for the product detail page.</p>
+  </div>
+</template>
+
+<script>
+import { onMounted, ref } from 'vue';
+import { useAppInsights } from './composables/useAppInsights';
+
+export default {
+  setup() {
+    const { appInsights, initializeAppInsights } = useAppInsights();
+    const pageLoadTime = ref(0);
+
+    const trackPageView = () => {
+      if (appInsights.value) {
+        appInsights.value.trackPageView({
+          name: 'ProductDetailPage',
+          uri: window.location.href,
+          duration: pageLoadTime.value,
+          properties: {
+            customProperty: 'customValue'
+          }
+        });
+      }
+    };
+
+    onMounted(() => {
+      const startTime = performance.now();
+      initializeAppInsights('YOUR_INSTRUMENTATION_KEY');
+
+      // Simulate loading time for the page
+      window.addEventListener('load', () => {
+        pageLoadTime.value = performance.now() - startTime;
+        trackPageView(); // Track the page view after the page has fully loaded
+      });
+    });
+
+    return {
+      trackPageView,
+    };
+  },
+};
+</script>
