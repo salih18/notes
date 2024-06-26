@@ -2,45 +2,35 @@
   <div>
     <h1>Product Detail Page</h1>
     <p>Track load time for the product detail page.</p>
+    <section>
+      <h2>Component Documentation</h2>
+      <p>The <code>PageView.vue</code> component is designed to track page load times for a product detail page using the <code>trackPageView</code> method from Application Insights. This component demonstrates how to use the <code>useAppInsights</code> composable to monitor user interactions and page performance, specifically focusing on measuring the time it takes for the entire page to load.</p>
+
+      <h3>Template</h3>
+      <p>The template consists of a <code>div</code> with a header and a paragraph explaining the purpose of the component.</p>
+
+      <h3>Setup</h3>
+      <p>The <code>setup</code> function initializes the composable and defines the <code>trackPageView</code> function.</p>
+
+      <h3>Initialization</h3>
+      <p>The <code>initializeAppInsights</code> function is called within the <code>onMounted</code> lifecycle hook to ensure Application Insights is initialized when the component mounts. The <code>startTime</code> variable captures the start time of the page load.</p>
+
+      <h3>Tracking Page Load Time</h3>
+      <p>The <code>load</code> event listener calculates the total page load time when the page has fully loaded. The <code>trackPageView</code> function is called to send the page view telemetry to Application Insights, including the calculated load time and any custom properties.</p>
+
+      <h3>Tracking Page Views</h3>
+      <p>The <code>trackPageView</code> function checks if the <code>appInsights</code> instance is available and then tracks the page view using the <code>trackPageView</code> method. Custom properties such as the page name, URI, duration, and additional properties can be included in the telemetry data.</p>
+
+      <h3>Best Practices</h3>
+      <ul>
+        <li><strong>Track Initial Page Load:</strong> Automatically track the initial page view and load time when the component is mounted to capture the user's entry point and page performance.</li>
+        <li><strong>Custom Properties:</strong> Include relevant custom properties to enhance the telemetry data and provide more context for analysis.</li>
+        <li><strong>Avoid Over-Tracking:</strong> Be mindful of tracking only significant page views to prevent unnecessary data collection and manage costs effectively.</li>
+      </ul>
+    </section>
   </div>
 </template>
 
 <script>
 import { onMounted, ref } from 'vue';
-import { useAppInsights } from './composables/useAppInsights';
-
-export default {
-  setup() {
-    const { appInsights, initializeAppInsights } = useAppInsights();
-    const pageLoadTime = ref(0);
-
-    const trackPageView = () => {
-      if (appInsights.value) {
-        appInsights.value.trackPageView({
-          name: 'ProductDetailPage',
-          uri: window.location.href,
-          duration: pageLoadTime.value,
-          properties: {
-            customProperty: 'customValue'
-          }
-        });
-      }
-    };
-
-    onMounted(() => {
-      const startTime = performance.now();
-      initializeAppInsights('YOUR_INSTRUMENTATION_KEY');
-
-      // Simulate loading time for the page
-      window.addEventListener('load', () => {
-        pageLoadTime.value = performance.now() - startTime;
-        trackPageView(); // Track the page view after the page has fully loaded
-      });
-    });
-
-    return {
-      trackPageView,
-    };
-  },
-};
-</script>
+import { useAppInsights } from './composables/useApp
