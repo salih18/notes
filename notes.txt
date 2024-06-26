@@ -33,4 +33,67 @@
 
 <script>
 import { onMounted, ref } from 'vue';
-import { useAppInsights } from './composables/useApp
+import { useAppInsights } from './composables/useAppInsights';
+
+export default {
+  setup() {
+    const { appInsights, initializeAppInsights } = useAppInsights();
+    const pageLoadTime = ref(0);
+    const sectionLoadTimes = ref({
+      productDetails: 0,
+      images: 0,
+      reviews: 0,
+      relatedProducts: 0,
+    });
+
+    const trackPageView = () => {
+      if (appInsights.value) {
+        appInsights.value.trackPageView({
+          name: 'ProductDetailPage',
+          uri: window.location.href,
+          duration: pageLoadTime.value,
+          properties: {
+            productDetailsLoadTime: sectionLoadTimes.value.productDetails,
+            imagesLoadTime: sectionLoadTimes.value.images,
+            reviewsLoadTime: sectionLoadTimes.value.reviews,
+            relatedProductsLoadTime: sectionLoadTimes.value.relatedProducts,
+            customProperty: 'customValue',
+          }
+        });
+      }
+    };
+
+    const trackSectionLoadTime = (sectionName, loadTime) => {
+      sectionLoadTimes.value[sectionName] = loadTime;
+    };
+
+    const simulateSectionLoad = (sectionName, loadDuration) => {
+      const startTime = performance.now();
+      setTimeout(() => {
+        const loadTime = performance.now() - startTime;
+        trackSectionLoadTime(sectionName, loadTime);
+      }, loadDuration);
+    };
+
+    onMounted(() => {
+      const startTime = performance.now();
+      initializeAppInsights('YOUR_INSTRUMENTATION_KEY');
+
+      // Simulate loading times for different sections
+      simulateSectionLoad('productDetails', 500);
+      simulateSectionLoad('images', 700);
+      simulateSectionLoad('reviews', 600);
+      simulateSectionLoad('relatedProducts', 800);
+
+      window.addEventListener('load', () => {
+        pageLoadTime.value = performance.now() - startTime;
+        trackPageView(); // Track the page view after the page has fully loaded
+      });
+    });
+
+    return {
+      trackPageView,
+    };
+  },
+};
+</script>
