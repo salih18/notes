@@ -1,3 +1,29 @@
+     name: 'ImageLoadTime',
+      average: loadTime, // Since there's only one sample, average is the same as the load time
+      sampleCount: 1, // Only one sample
+      min: loadTime, // Min is the load time
+      max: loadTime, // Max is the load time
+      stdDev: 0 // Standard deviation is 0 because there's only one sample
+
+<template>
+  <div>
+    <h1>Track Image Load Time</h1>
+    <!-- The img element below will trigger the onImageLoad function when it fully loads -->
+    <img ref="productImage" src="https://via.placeholder.com/600x400" alt="Product Image" @load="onImageLoad">
+    <p>
+      This component tracks the load time for the product image and sends the data to Application Insights.
+      <ul>
+        <li><strong>average</strong>: The average load time of the image.</li>
+        <li><strong>sampleCount</strong>: The number of samples, which is 1 in this case.</li>
+        <li><strong>min</strong>: The minimum load time, which is equal to the load time for a single sample.</li>
+        <li><strong>max</strong>: The maximum load time, which is equal to the load time for a single sample.</li>
+        <li><strong>stdDev</strong>: The standard deviation, which is 0 because there is only one sample.</li>
+      </ul>
+    </p>
+  </div>
+</template>
+
+
 <template>
   <div>
     <h1>Track Image Load Time</h1>
