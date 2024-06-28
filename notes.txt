@@ -1,5 +1,64 @@
 <template>
   <div>
+    <h1>Track Image Load Time</h1>
+    <img ref="productImage" src="https://via.placeholder.com/600x400" alt="Product Image" @load="onImageLoad">
+    <p>Track load time for the product image.</p>
+  </div>
+</template>
+
+<script>
+import { onMounted, ref } from 'vue';
+import { useAppInsights } from './composables/useAppInsights';
+
+export default {
+  setup() {
+    const { appInsights, initializeAppInsights } = useAppInsights();
+    const imageLoadTime = ref(0);
+    const productImage = ref(null);
+
+    const trackImageLoadTime = (loadTime) => {
+      if (appInsights.value) {
+        appInsights.value.trackMetric({
+          name: 'ImageLoadTime',
+          average: loadTime,
+          sampleCount: 1,
+          min: loadTime,
+          max: loadTime,
+          stdDev: 0
+        });
+      }
+    };
+
+    const onImageLoad = () => {
+      imageLoadTime.value = performance.now() - imageStartTime;
+      trackImageLoadTime(imageLoadTime.value);
+    };
+
+    onMounted(() => {
+      initializeAppInsights('YOUR_INSTRUMENTATION_KEY');
+
+      // Start time for image load
+      const imageStartTime = performance.now();
+
+      // Track image load time when image is loaded
+      if (productImage.value) {
+        productImage.value.addEventListener('load', onImageLoad);
+      }
+    });
+
+    return {
+      productImage,
+      onImageLoad,
+    };
+  },
+};
+</script>
+
+
+
+
+<template>
+  <div>
     <h1>Product Detail Page</h1>
     <p>Track load time for the product detail page.</p>
     <section>
