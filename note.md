@@ -26,9 +26,7 @@ az monitor autoscale rule create \
   --condition "Percentage CPU > 70 avg 2m" \
   --scale out 1 \
   --cooldown 300 \
-  --resource "$APP_SERVICE_PLAN" \
-  --resource-group "$RESOURCE_GROUP" \
-  --resource-type "Microsoft.Web/serverfarms"
+  --resource "$TARGET_RESOURCE_ID"
 
 # Step 4: Add a rule for scaling in based on CPU usage (<30% for 5 minutes)
 az monitor autoscale rule create \
@@ -37,9 +35,7 @@ az monitor autoscale rule create \
   --condition "Percentage CPU < 30 avg 5m" \
   --scale in 1 \
   --cooldown 300 \
-  --resource "$APP_SERVICE_PLAN" \
-  --resource-group "$RESOURCE_GROUP" \
-  --resource-type "Microsoft.Web/serverfarms"
+  --resource "$TARGET_RESOURCE_ID"
 
 # Step 5: Add a recurring schedule for scaling out (scale to 5 instances at 8 AM daily)
 az monitor autoscale profile create \
