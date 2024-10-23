@@ -14,7 +14,7 @@ az account set --subscription "$SUBSCRIPTION_ID"
 az monitor autoscale create \
   --resource-group "$RESOURCE_GROUP" \
   --name "AppServiceScalingSetting" \
-  --target-resource-id "$TARGET_RESOURCE_ID" \
+  --resource "$TARGET_RESOURCE_ID" \
   --min-count 2 \
   --max-count 10 \
   --count 2
@@ -23,8 +23,8 @@ az monitor autoscale create \
 az monitor autoscale rule create \
   --resource-group "$RESOURCE_GROUP" \
   --autoscale-name "AppServiceScalingSetting" \
-  --condition "Percentage CPU > 70 avg 2m" \
   --scale out 1 \
+  --condition "Percentage CPU > 70 avg 2m" \
   --cooldown 300 \
   --resource "$TARGET_RESOURCE_ID"
 
@@ -32,8 +32,8 @@ az monitor autoscale rule create \
 az monitor autoscale rule create \
   --resource-group "$RESOURCE_GROUP" \
   --autoscale-name "AppServiceScalingSetting" \
-  --condition "Percentage CPU < 30 avg 5m" \
   --scale in 1 \
+  --condition "Percentage CPU < 30 avg 5m" \
   --cooldown 300 \
   --resource "$TARGET_RESOURCE_ID"
 
@@ -42,33 +42,21 @@ az monitor autoscale profile create \
   --resource-group "$RESOURCE_GROUP" \
   --autoscale-name "AppServiceScalingSetting" \
   --name "MorningScaleOutSchedule" \
-  --count 5 \
   --min-count 2 \
+  --count 5 \
   --max-count 5 \
-  --recurrence '{
-    "frequency": "Week",
-    "schedule": {
-      "timeZone": "W. Europe Standard Time",
-      "days": [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ],
-      "hours": [ 8 ],
-      "minutes": [ 0 ]
-    }
-  }'
+  --recurrence week \
+  --timezone "W. Europe Standard Time" \
+  --start 08:00
 
 # Step 6: Add a recurring schedule for scaling in (scale to 2 instances at 6 PM daily)
 az monitor autoscale profile create \
   --resource-group "$RESOURCE_GROUP" \
   --autoscale-name "AppServiceScalingSetting" \
   --name "EveningScaleInSchedule" \
-  --count 2 \
   --min-count 2 \
+  --count 2 \
   --max-count 2 \
-  --recurrence '{
-    "frequency": "Week",
-    "schedule": {
-      "timeZone": "W. Europe Standard Time",
-      "days": [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ],
-      "hours": [ 18 ],
-      "minutes": [ 0 ]
-    }
-  }'
+  --recurrence week \
+  --timezone "W. Europe Standard Time" \
+  --start 18:00
