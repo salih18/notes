@@ -8,11 +8,11 @@ LOCATION="westeurope"  # Location set to West Europe
 TARGET_RESOURCE_ID="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Web/serverfarms/$APP_SERVICE_PLAN"
 
 # Step 1: Set the subscription context
-az account set --subscription $SUBSCRIPTION_ID
+az account set --subscription "$SUBSCRIPTION_ID"
 
 # Step 2: Create Autoscale Setting with default profile
 az monitor autoscale create \
-  --resource-group $RESOURCE_GROUP \
+  --resource-group "$RESOURCE_GROUP" \
   --name "AppServiceScalingSetting" \
   --target-resource-id "$TARGET_RESOURCE_ID" \
   --min-count 2 \
@@ -21,46 +21,58 @@ az monitor autoscale create \
 
 # Step 3: Add a rule for scaling out based on CPU usage (>70% for 2 minutes)
 az monitor autoscale rule create \
-  --resource-group $RESOURCE_GROUP \
+  --resource-group "$RESOURCE_GROUP" \
   --autoscale-name "AppServiceScalingSetting" \
-  --resource "$TARGET_RESOURCE_ID" \
   --condition "Percentage CPU > 70 avg 2m" \
-  --scale "out 1" \
-  --cooldown 300  # 5 minutes cooldown period
+  --scale out 1 \
+  --cooldown 300 \
+  --resource "$APP_SERVICE_PLAN" \
+  --resource-group "$RESOURCE_GROUP" \
+  --resource-type "Microsoft.Web/serverfarms"
 
 # Step 4: Add a rule for scaling in based on CPU usage (<30% for 5 minutes)
 az monitor autoscale rule create \
-  --resource-group $RESOURCE_GROUP \
+  --resource-group "$RESOURCE_GROUP" \
   --autoscale-name "AppServiceScalingSetting" \
-  --resource "$TARGET_RESOURCE_ID" \
   --condition "Percentage CPU < 30 avg 5m" \
-  --scale "in 1" \
-  --cooldown 300  # 5 minutes cooldown period
+  --scale in 1 \
+  --cooldown 300 \
+  --resource "$APP_SERVICE_PLAN" \
+  --resource-group "$RESOURCE_GROUP" \
+  --resource-type "Microsoft.Web/serverfarms"
 
 # Step 5: Add a recurring schedule for scaling out (scale to 5 instances at 8 AM daily)
 az monitor autoscale profile create \
-  --resource-group $RESOURCE_GROUP \
+  --resource-group "$RESOURCE_GROUP" \
   --autoscale-name "AppServiceScalingSetting" \
   --name "MorningScaleOutSchedule" \
   --count 5 \
   --min-count 2 \
   --max-count 5 \
-  --recurrence week \
-  --timezone "Central European Standard Time" \
-  --days "Sun Mon Tue Wed Thu Fri Sat" \
-  --hours 8 \
-  --minutes 0
+  --recurrence '{
+    "frequency": "Week",
+    "schedule": {
+      "timeZone": "W. Europe Standard Time",
+      "days": [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ],
+      "hours": [ 8 ],
+      "minutes": [ 0 ]
+    }
+  }'
 
 # Step 6: Add a recurring schedule for scaling in (scale to 2 instances at 6 PM daily)
 az monitor autoscale profile create \
-  --resource-group $RESOURCE_GROUP \
+  --resource-group "$RESOURCE_GROUP" \
   --autoscale-name "AppServiceScalingSetting" \
   --name "EveningScaleInSchedule" \
   --count 2 \
   --min-count 2 \
   --max-count 2 \
-  --recurrence week \
-  --timezone "Central European Standard Time" \
-  --days "Sun Mon Tue Wed Thu Fri Sat" \
-  --hours 18 \
-  --minutes 0
+  --recurrence '{
+    "frequency": "Week",
+    "schedule": {
+      "timeZone": "W. Europe Standard Time",
+      "days": [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ],
+      "hours": [ 18 ],
+      "minutes": [ 0 ]
+    }
+  }'
