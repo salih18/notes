@@ -24,7 +24,7 @@ az monitor autoscale rule create \
   --resource-group $RESOURCE_GROUP \
   --autoscale-name "AppServiceScalingProfile" \
   --condition "Percentage CPU > 70 avg 2m" \
-  --scale out 1 \
+  --scale "+1" \
   --cooldown 300  # 5 minutes cooldown period
 
 # Step 4: Add a rule for scaling in based on CPU usage (<30% for 5 minutes)
@@ -32,31 +32,31 @@ az monitor autoscale rule create \
   --resource-group $RESOURCE_GROUP \
   --autoscale-name "AppServiceScalingProfile" \
   --condition "Percentage CPU < 30 avg 5m" \
-  --scale in 1 \
+  --scale "-1" \
   --cooldown 300  # 5 minutes cooldown period
 
 # Step 5: Add a recurring schedule for scaling out (e.g., scale to 5 instances at 8 AM daily)
 az monitor autoscale profile create \
+  --resource-group $RESOURCE_GROUP \
   --autoscale-name "AppServiceScalingProfile" \
   --name "MorningScaleOutSchedule" \
-  --resource-group $RESOURCE_GROUP \
   --min-count 2 \
   --max-count 5 \
   --count 5 \
-  --recurrence week Sun Mon Tue Wed Thu Fri Sat \
-  --start 08:00 \
-  --end 08:30 \
-  --timezone "UTC"
+  --recurrence "week Sun Mon Tue Wed Thu Fri Sat" \
+  --timezone "UTC" \
+  --start "08:00" \
+  --end "08:30"
 
 # Step 6: Add a recurring schedule for scaling in (e.g., scale to 2 instances at 6 PM daily)
 az monitor autoscale profile create \
+  --resource-group $RESOURCE_GROUP \
   --autoscale-name "AppServiceScalingProfile" \
   --name "EveningScaleInSchedule" \
-  --resource-group $RESOURCE_GROUP \
   --min-count 2 \
   --max-count 2 \
   --count 2 \
-  --recurrence week Sun Mon Tue Wed Thu Fri Sat \
-  --start 18:00 \
-  --end 18:30 \
-  --timezone "UTC"
+  --recurrence "week Sun Mon Tue Wed Thu Fri Sat" \
+  --timezone "UTC" \
+  --start "18:00" \
+  --end "18:30"
