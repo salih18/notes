@@ -5,6 +5,7 @@ RESOURCE_GROUP="myResourceGroup"
 APP_SERVICE_PLAN="myAppServicePlan"
 SUBSCRIPTION_ID="<YourSubscriptionId>"  # Update with your Azure subscription ID
 LOCATION="westeurope"  # Location set to West Europe
+TARGET_RESOURCE_ID="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Web/serverfarms/$APP_SERVICE_PLAN"
 
 # Step 1: Set the subscription context
 az account set --subscription $SUBSCRIPTION_ID
@@ -13,7 +14,7 @@ az account set --subscription $SUBSCRIPTION_ID
 az monitor autoscale create \
   --resource-group $RESOURCE_GROUP \
   --name "AppServiceScalingSetting" \
-  --target "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Web/serverfarms/$APP_SERVICE_PLAN" \
+  --target-resource-id "$TARGET_RESOURCE_ID" \
   --min-count 2 \
   --max-count 10 \
   --count 2
@@ -22,16 +23,18 @@ az monitor autoscale create \
 az monitor autoscale rule create \
   --resource-group $RESOURCE_GROUP \
   --autoscale-name "AppServiceScalingSetting" \
+  --resource "$TARGET_RESOURCE_ID" \
   --condition "Percentage CPU > 70 avg 2m" \
-  --scale out 1 \
+  --scale "out 1" \
   --cooldown 300  # 5 minutes cooldown period
 
 # Step 4: Add a rule for scaling in based on CPU usage (<30% for 5 minutes)
 az monitor autoscale rule create \
   --resource-group $RESOURCE_GROUP \
   --autoscale-name "AppServiceScalingSetting" \
+  --resource "$TARGET_RESOURCE_ID" \
   --condition "Percentage CPU < 30 avg 5m" \
-  --scale in 1 \
+  --scale "in 1" \
   --cooldown 300  # 5 minutes cooldown period
 
 # Step 5: Add a recurring schedule for scaling out (scale to 5 instances at 8 AM daily)
@@ -43,7 +46,7 @@ az monitor autoscale profile create \
   --min-count 2 \
   --max-count 5 \
   --recurrence week \
-  --timezone "UTC" \
+  --timezone "Central European Standard Time" \
   --days "Sun Mon Tue Wed Thu Fri Sat" \
   --hours 8 \
   --minutes 0
@@ -57,7 +60,7 @@ az monitor autoscale profile create \
   --min-count 2 \
   --max-count 2 \
   --recurrence week \
-  --timezone "UTC" \
+  --timezone "Central European Standard Time" \
   --days "Sun Mon Tue Wed Thu Fri Sat" \
   --hours 18 \
   --minutes 0
