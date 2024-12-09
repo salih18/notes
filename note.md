@@ -1,3 +1,13 @@
+  - script: |
+      IF EXIST "C:\tools\handle.exe" (
+        "C:\tools\handle.exe" -u "$(Build.SourcesDirectory)\.temp" > "$(Build.ArtifactStagingDirectory)\handle-output.txt"
+      ) ELSE (
+        echo handle.exe not found. Please install Sysinternals handle on this agent.
+      )
+    condition: failed()
+    displayName: "Identify file-locking processes with handle.exe"
+
+
 trigger:
   - main
 
