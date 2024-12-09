@@ -1,3 +1,7 @@
+- script: mkdir /tmp
+  shell: bash
+  displayName: "Create /tmp directory for Bash"
+
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
