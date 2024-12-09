@@ -1,3 +1,36 @@
+trigger:
+  - main
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  TMPDIR: '$(Build.SourcesDirectory)\\.temp'
+  TEMP: '$(Build.SourcesDirectory)\\.temp'
+  TMP: '$(Build.SourcesDirectory)\\.temp'
+
+steps:
+  - script: |
+      IF NOT EXIST "$(Build.SourcesDirectory)\.temp" (
+        mkdir $(Build.SourcesDirectory)\.temp
+      )
+      del /F /Q "$(Build.SourcesDirectory)\.temp\*"
+    displayName: "Clean dedicated temp directory"
+
+  # Print out environment variables to confirm they are set correctly
+  - script: |
+      echo TMPDIR=%TMPDIR%
+      echo TEMP=%TEMP%
+      echo TMP=%TMP%
+    displayName: "Check environment variables"
+
+  - script: |
+      npm install
+      npm run ci-test-unit
+    displayName: "Run Vitest tests"
+
+
+
 # azure-pipelines.yml
 # This pipeline:
 # 1. Uses a dedicated .temp directory for Vitest temporary files.
