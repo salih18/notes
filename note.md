@@ -1,3 +1,34 @@
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    // Choose the threads pool
+    pool: 'threads',
+
+    // Ensure each test file runs in isolation
+    isolate: true,
+
+    // Configure the threads pool to force a single-threaded run
+    poolOptions: {
+      threads: {
+        // singleThread forces all tests to run sequentially in a single thread
+        singleThread: true,
+      },
+    },
+
+    // Other test options...
+    globals: true,
+    environment: 'node',
+    coverage: {
+      provider: 'v8',
+      enabled: true,
+      reportsDirectory: './coverage'
+    },
+  },
+});
+
+
+
   - script: |
       IF EXIST "C:\tools\handle.exe" (
         "C:\tools\handle.exe" -u "$(Build.SourcesDirectory)\.temp" > "$(Build.ArtifactStagingDirectory)\handle-output.txt"
